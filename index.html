@@ -1,0 +1,123 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My first leaflet</title>
+</head>
+    <!-- link css leaflet-->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""/>
+    <!--link js leaflet -->
+    <!-- Make sure you put this AFTER Leaflet's CSS -->
+ <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+ integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+ crossorigin=""></script>
+ <style>
+    body {
+padding: 0;
+margin: 0;
+}
+
+html,
+body,
+#map {
+height: 100%;
+width: 100%;
+}
+</style>
+
+
+<body>
+    <!--แบ่งส่วนหน้าจอ-->
+    <div id = "map" style = "width:100% ; height: 100%"> </div>
+    <script>
+        //set view map 
+        var map = L.map('map').setView([18.775369470137058, 100.77166569369305], 10);
+
+        //import Based map 
+        var OSM = L.tileLayer('https://tile.openstreetmap.de/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> contributors'
+        }).addTo(map);
+
+        var stadia = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.{ext}', {
+            minZoom: 0,
+            maxZoom: 20,
+            attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            ext: 'png'
+        }).addTo(map);
+
+        var Esri = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+        }).addTo(map);
+
+        var baseLayers = {
+            "OSM" : OSM,
+            "stadia" : stadia,
+            "Esri" : Esri,
+        }
+        L.control.layers(baseLayers).addTo(map);
+    
+         //การเพิ่มข้อมูลลงบนแผนที่ 
+          var point = L.marker([18.775369470137058, 100.77166569369305],{
+          draggable: true,  //สามารเลื่อนจุดต่างๆได้ 
+          title: 'จังหวัดน่าน', //ชื่อจุด
+          opacity: 1.5   //ความทึบแสงของจุด 
+          }).addTo(map);
+
+     //เพิ่มข้อมูลลงในแผนที่
+    point.bindPopup("<b>จังหวัดน่าน</b>")
+     .openPopup();
+
+     //แสดงข้อมูลหลายจุด
+     var swu = [
+     ["Phumin Temple<br>วัดภูมินทร์", 18.774788141790506, 100.77166045324454],
+     ["Phrathat Chaehang Temple<br>วัดพระธาตุแช่แห้ง", 18.758477188935835, 100.79166581420809],
+     ["Phrathatkaaonoi Temple<br>วัดพระธาตุเขาน้อย", 18.769428392280155, 100.75046763975196],
+     ["Sri Nan National Park-Doisamerdao<br>ดอยเสมอดาว", 18.376218431576167, 100.82747346318945],
+     ["Sri Nan National Park-Saodinnanoi<br>เสาดินนาน้อย", 18.303653968154062, 100.75302355699084],
+     ["Phuket Temple<br>วัดภูเก็ต", 19.165382318082365, 100.93412993657422],
+     ["Ban Tai Lue café<br>กาแฟบ้านไทลื้อ", 19.14574618018616, 100.94069787193396],
+     ["Mingmuang Temple<br>วัดมิ่งเมือง", 18.77480581803455, 100.76911630616718],
+     ["Sripanton Temple<br>วัดศรีพันต้น", 18.77588143532378, 100.76577064250358],
+     ["Nornan Café<br>น น่าน คาเฟ่", 18.789341820093245, 100.78667176777503],
+ ];
+
+ //เปลี่ยน icon
+ var greenIcon = L.icon({
+     iconUrl: 'https://cdn-icons-png.freepik.com/256/6773/6773585.png?semt=sph', //คัดลอกที่อยู่ของรูปภาพมาใส่
+    //shadowUrl: 'https://leafletjs.com/examples/custom-icons/leaf-shadow.png', 
+    
+     iconSize: [50, 50], // size of the icon
+    //shadowSize: [50, 64], // size of the shadow ใหญ่กว่าไอคอน 
+     iconAnchor: [22, 94], // point of the icon which will correspond to marker's location
+    //shadowAnchor: [4, 62], // the same for the shadow
+     popupAnchor: [-3, -76] // point from which the popup should open relative to the iconAnchor
+ });
+
+ for (var i = 0; i < swu.length; i++) {
+    
+     marker = new L.marker([swu[i][1], swu[i][2]], {icon: greenIcon})
+     .bindPopup(swu[i][0])
+     .addTo(map);
+ }
+
+ //description/legend คำอธิบาย 
+ var legend = L.control({position: "bottomright"}); //แสดงที่มุมขวาบน
+ legend.onAdd = function(map) {              //แสดงผล
+     var div = L.DomUtil.create("div", "legend");     //แสดงคำ
+     div.innerHTML = 
+     '<p><b>10 สถานที่ท่องเที่ยวจังหวัดน่าน</b></p><hr>' +      //คำว่าศรีนครินทรวิโรฒเป็นตัวหนา<b> และมีเส้นขั้น<hr>
+     'Created by Pornchanok Puttinet<br>' +    //สร้างโดยใส่ชื่อตัวเอง 
+     'ID: 64103010304<br>'+      //ใส่รหัส 
+     '<img src="https://unity.swu.ac.th/wp-content/uploads/2020/07/SWU_Logo_EN_Color.png" width = 20%>';   //ใส่ตรามหาวิทยาลัย
+     return div};
+ legend.addTo(map);
+
+
+
+</script>
+    
+</body>
+</html>
